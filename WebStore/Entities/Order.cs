@@ -17,6 +17,16 @@ namespace WebStore.Entities
         public int ShippingAddressId { get; set; }
         public int BillingAddressId { get; set; }
 
+        public int? CarrierId { get; set; }
+        public string? TrackingNumber { get; set; }
+        public DateTime? ShippedDate { get; set; }
+        public DateTime? DeliveredDate { get; set; }
+
+        /// <summary>
+        /// Navigation to the carrier (e.g. "UPS", "FedEx")
+        /// </summary>
+        public Carrier? Carrier { get; set; }
+
         public virtual Address BillingAddress { get; set; } = null!;
         public virtual Customer Customer { get; set; } = null!;
         public virtual Address ShippingAddress { get; set; } = null!;

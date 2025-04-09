@@ -25,6 +25,7 @@ namespace WebStore.Entities
         public virtual DbSet<Stock> Stocks { get; set; } = null!;
         public virtual DbSet<Store> Stores { get; set; } = null!;
         public virtual DbSet<staff> staff { get; set; } = null!;
+        public DbSet<Carrier> Carriers => Set<Carrier>();
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -120,6 +121,35 @@ namespace WebStore.Entities
                         });
             });
 
+
+
+            modelBuilder.Entity<Carrier>(entity =>
+            {
+                entity.HasKey(e => e.CarrierId).HasName("carriers_pkey");
+
+                entity.ToTable("carriers");
+                entity.Property(e => e.CarrierName)
+                    .HasMaxLength(50)
+                    .HasColumnName("carrier_name");
+
+                entity.Property(e => e.ContactUrl)
+                    .HasMaxLength(50)
+                    .HasColumnName("contact_url");
+
+                entity.Property(e => e.ContactPhone)
+                    .HasMaxLength(50)
+                    .HasColumnName("contact_phone");
+
+                entity.HasMany(c => c.Orders)
+                    .WithOne(o => o.Carrier)
+                    .HasForeignKey(o => o.CarrierId)
+                    .OnDelete(DeleteBehavior.SetNull); // If carrier is deleted -> order reference is set to null
+            });
+
+
+
+
+
             modelBuilder.Entity<Customer>(entity =>
             {
                 entity.ToTable("customers");
@@ -198,6 +228,20 @@ namespace WebStore.Entities
                     .HasForeignKey(d => d.ShippingAddressId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("fk_orders_shipping_address");
+
+                // Key, columns, etc.
+                // entity.HasKey(o => o.OrderId);
+
+                // For the order tracking fields:
+                entity.Property(o => o.TrackingNumber)
+                      .HasColumnName("tracking_number")
+                      .HasMaxLength(50);
+
+                entity.Property(o => o.ShippedDate)
+                      .HasColumnName("shipped_date");
+
+                entity.Property(o => o.DeliveredDate)
+                      .HasColumnName("delivered_date");
             });
 
             modelBuilder.Entity<OrderItem>(entity =>
